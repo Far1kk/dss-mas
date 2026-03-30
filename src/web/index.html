@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DSS-MAS — Система поддержки принятия решений</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- Шапка -->
+  <header class="header">
+    <div>
+      <h1>DSS-MAS</h1>
+      <p>Система поддержки принятия решений на основе ИИ</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Поле ввода -->
+    <div class="search-box">
+      <div class="input-row">
+        <textarea
+          id="query-input"
+          placeholder="Задайте вопрос или поставьте задачу..."
+          rows="1"
+        ></textarea>
+        <button id="send-btn" class="btn-send" title="Отправить (Enter)">&#10148;</button>
+      </div>
+
+      <!-- Провайдер LLM -->
+      <div class="provider-row">
+        <span>Модель:</span>
+        <select id="provider-select">
+          <option value="gigachat">GigaChat</option>
+          <option value="openai">OpenAI</option>
+          <option value="deepseek">DeepSeek</option>
+          <option value="ollama">Ollama (локальный)</option>
+        </select>
+      </div>
+
+      <!-- Подсказки -->
+      <div id="hints" class="hints"></div>
+    </div>
+
+    <!-- Результат -->
+    <div id="result-card" class="result-card">
+
+      <!-- Строка статуса -->
+      <div class="status-line">
+        <div id="spinner" class="spinner"></div>
+        <span id="status-text">Обрабатываю запрос...</span>
+      </div>
+
+      <!-- Ошибка -->
+      <div id="error-line" class="error-line"></div>
+
+      <!-- Ответ агента -->
+      <div id="result-body" class="result-body"></div>
+
+      <!-- Обратная связь -->
+      <div id="feedback-row" class="feedback-row">
+        <div class="feedback-btns">
+          <span style="font-size:13px;color:var(--text-muted)">Оцените ответ:</span>
+          <button id="btn-like" class="btn-like">👍 Нравится</button>
+          <button id="btn-dislike" class="btn-dislike">👎 Не нравится</button>
+        </div>
+        <div id="feedback-comments" class="feedback-comments"></div>
+        <div id="feedback-sent" class="feedback-sent">Спасибо за оценку!</div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

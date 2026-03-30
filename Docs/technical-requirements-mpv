@@ -1,0 +1,136 @@
+
+It is necessary to develop a prototype for the future system. A multi-agent system must be created to perform data science tasks and search for data in a database based on LLM and machine learning methods.
+The system must:
+1. Provide a self-service database search service:
+a. Generate SQL code based on a user's natural language query
+2. Provide a self-service execution of machine learning algorithms:
+a. Store a repository of ML models
+b. Formulate a machine learning problem based on a user query
+c. Extract input data from the database
+d. Preprocess the input data and select features
+e. Select a suitable ML model or ensemble of models
+f. Implement machine learning algorithms based on a user query
+g. Train an ML model or models
+h. Select the best ML models
+i. Conduct experiments with different combinations of ML models
+j. Assess the quality of output data.
+Open-source AutoML tools, such as LightAutoML, are proposed as a solution.
+If necessary, the system can ask users for clarification.
+The system should store and process the context of early user requests.
+After ML queries, the system should provide a brief explanation to the user of its results. The system should also provide a more detailed interpretation of the resulting data.
+The ability to select local and API LLM models should be supported.
+The system should support the following machine learning algorithms:
+1. Decision tree
+2. Naive Bayes classification
+3. Ordinary least squares (linear regression)
+4. Logistic regression
+5. Support vector machine (SVM)
+6. Ensemble method
+7. Clustering algorithms
+8. Principal component analysis (PCA)
+9. Singular value decomposition
+10. Independent component analysis (ICA)
+11. Also, time series algorithms and causal inference methods.
+The system should operate with current knowledge of the organization, terminology, state, configuration, and semantics, database metadata, and business rules. Therefore, a multi-agent system must implement an ontology and a RAG system. A solution for storing, processing, and modifying the ontology must be developed.
+
+A web interface must be implemented.
+1. Users must be able to provide text input to assign tasks to agents. Solution: Long text input on a screen, similar to Google.
+2. Users must be able to see the task progress and current status in real time. Solution: Type text about the current status and solution selection under each query.
+
+3. Users must be provided with hints on agent capabilities. Solution: In the form of small tags on the query input page. When clicked, a sample task is inserted into the query input field, for example, predict, classify, find in a database, etc.
+
+4. Users must be able to rate the answer and leave comments on the system's performance. Solution: Below the result output, there are like and dislike buttons. When clicked, pre-prepared comments on the results appear, such as information is incorrect, does not match the query, or, conversely, what they liked about the answer.
+5. The interface should be simple, soft, and light-colored.
+6. Language - russian
+
+Database – PostgreSQL.
+Here are the SQL DDL scripts for creating sample tables in the database to which data needs to be added:
+--Таблица с выработкой по проектам по периодам
+CREATE TABLE dds.fact_forecast (
+issueid int8 NOT NULL, -- идентификатор выработки
+summary varchar(255) NULL, -- название документа выработки
+created timestamptz NULL, -- дата создания документа выработки
+updated timestamptz NULL, -- дата обновления документа выработки
+description text NULL, -- Описание в документе
+date_start date NULL, -- дата старта выработки
+date_end date NULL, -- дата окончания выработки
+forecast_sum float8 NULL, -- прогнозный доход от выработки
+income_subcounteragent int4 NULL, -- доходы от субподрядчиков по выработке
+pr_id int8 NULL, -- ID проекта выработки
+dwh_insert_date timestamp DEFAULT now() NOT NULL, -- дата добавления записи в dwh
+dwh_update_date timestamp DEFAULT now() NOT NULL, -- дата обновления записи в dwh
+dwh_delete_date timestamp NULL, -- дата удаления записи из dwh
+plan_date_pay date NULL, -- планируемая дата оплаты от заказчика по выработке
+fact_sum float8 NULL, -- фактический доход по выработке
+plan_cost_k numeric NULL, -- прогнозный доход от выработки с поправочным коэффициентом
+status int4 NULL, -- текущий статус выработки
+CONSTRAINT dim_forecast_pk PRIMARY KEY (issueid),
+CONSTRAINT dim_forecast_fk FOREIGN KEY (pr_id) REFERENCES dds.dim_project(issueid) ON UPDATE CASCADE,
+);
+
+-- Справочная таблица проектов
+CREATE TABLE dds.dim_project (
+issueid int8 NOT NULL, -- ID проекта
+project_name varchar(255) NULL, -- Название проекта
+created timestamptz NULL, -- Дата создания документа проекта
+updated timestamptz NULL, -- Дата обновления документа проекта
+status int4 NULL, -- Статус проекта
+type int4 NULL, -- Тип проекта
+description text NULL, -- Описание проекта
+date_begin date NULL, -- Дата старта проекта
+date_end date NULL, -- Дата окончания проекта
+kam varchar(255) NULL, -- Менеджер по работе с ключевыми клиентами проекта
+pm varchar(255) NULL, -- Проджект менеджер проекта
+front_admin varchar(255) NULL, -- Фронт-админ проекта
+dwh_insert_date timestamp DEFAULT now() NOT NULL, -- Дата добавления записи в dwh
+dwh_update_date timestamp DEFAULT now() NOT NULL, -- Дата обновления записи в dwh
+dwh_delete_date timestamp NULL, -- Дата удаления записи из dwh
+labor_cost_accounting_type int4 NULL, -- Тип учета трудозатрат (ТМ, Фикс, по умолчнию, ТМ&Фикс)
+CONSTRAINT dim_project_pk PRIMARY KEY (issueid)
+);
+
+-- Справочная таблица заказчиков, контрагентов
+CREATE TABLE dds.dim_counteragent (
+dwh_id int8 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1 NO CYCLE) NOT NULL, -- ID заказчика
+jira_id int8 NULL, -- ID заказчика в jira
+counteragent text NULL, -- Наименование контрагента, заказчика
+industry int4 NULL, -- Сфера деятельности заказчика
+responsible varchar NULL, -- Ответственный менеджер по работе с ключевыми клиентами
+CONSTRAINT dim_counteragent_pk PRIMARY KEY (dwh_id)
+);
+
+-- Таблица связей проектов и доходных договоров проектов
+CREATE TABLE dds.link_contract_project (
+contract_id int8 NOT NULL, -- ID контракта
+project_id int8 NOT NULL, -- ID проекта
+dwh_insert_date timestamp DEFAULT now() NOT NULL, -- дата добавления строки в DWH
+dwh_delete_date timestamp NULL, -- дата удаления строки из DWH
+CONSTRAINT link_contract_project_pk PRIMARY KEY (contract_id, project_id),
+CONSTRAINT link_contract_project_contract_id_fkey FOREIGN KEY (contract_id) REFERENCES dds.dim_contract(jira_issueid) ON UPDATE CASCADE,
+CONSTRAINT link_contract_project_project_id_fkey FOREIGN KEY (project_id) REFERENCES dds.dim_project(issueid) ON UPDATE CASCADE
+);
+
+-- Таблица контрактов
+CREATE TABLE dds.dim_contract (
+jira_issueid int8 NOT NULL, -- ID контракта
+"name" varchar(255) NULL, -- Название документа контракта
+type int4 NULL, -- Тип контракта (доходный договор, расходный договор, акт) –бизнес-правило – заказчик проекта = контрагент текущего доходного договора проекта
+counteragent_id int8 NULL, -- ID контрагента контракта
+sum float8 NULL, -- Сумма контракта
+date_sign date NULL, -- Дата начала контракта
+date_end date NULL, -- Дата окончания контракта
+dwh_insert_date timestamp DEFAULT now() NOT NULL, -- Дата добавления записи в dwh
+dwh_update_date timestamp DEFAULT now() NOT NULL, -- Дата обновления записи в dwh
+dwh_delete_date timestamp NULL, -- Дата удаления записи из dwh
+date_created timestamptz NULL, -- Дата создания документа контракта
+company int4 NULL, -- Внутренняя организация контракта
+status int4 NULL, -- Статус контракта
+project_id int4 NULL, -- ID проекта контракта
+manager text NULL, -- Ответственный менеджер контракта
+curator text NULL, -- Куратор контракта
+resolution text NULL, -- Решение по контракту
+revenue_it float4 NULL, -- Выручка IT для контрактов типа акт
+revenue_non_it float4 NULL, -- Выручка не IT для контрактов типа акт
+CONSTRAINT dim_contract_pk PRIMARY KEY (jira_issueid),
+CONSTRAINT dim_contract_counteragent_id_fkey FOREIGN KEY (counteragent_id) REFERENCES dds.dim_counteragent(dwh_id) ON UPDATE CASCADE
+);
