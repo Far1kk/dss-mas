@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     gigachat_client_secret: Optional[str] = Field(None, alias="GIGACHAT_CLIENT_SECRET")
 
     # Альтернативные провайдеры
+    claude_api_key: Optional[str] = Field(None, alias="CLAUDE_API_KEY")
     openai_api_key: Optional[str] = Field(None, alias="OPENAI_API_KEY")
     deepseek_api_key: Optional[str] = Field(None, alias="DEEPSEEK_API_KEY")
     ollama_base_url: str = Field("http://localhost:11434", alias="OLLAMA_BASE_URL")
@@ -33,8 +34,8 @@ class Settings(BaseSettings):
     )
 
     # Приложение
-    app_host: str = Field("0.0.0.0", alias="APP_HOST")
-    app_port: int = Field(8000, alias="APP_PORT")
+    app_host: str = Field("192.168.0.17", alias="APP_HOST")
+    app_port: int = Field(5000, alias="APP_PORT")
     default_llm_provider: str = Field("gigachat", alias="DEFAULT_LLM_PROVIDER")
 
     # LightAutoML (отключено по умолчанию — не устанавливается на Windows)
@@ -42,3 +43,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

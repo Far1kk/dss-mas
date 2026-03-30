@@ -3,6 +3,7 @@ from enum import Enum
 
 class LLMProvider(str, Enum):
     GIGACHAT = "gigachat"
+    CLAUDE = "claude"
     OPENAI = "openai"
     DEEPSEEK = "deepseek"
     OLLAMA = "ollama"

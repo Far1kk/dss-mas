@@ -21,6 +21,14 @@ class LLMFactory:
                 **kwargs,
             )
 
+        if provider == LLMProvider.CLAUDE:
+            from langchain_anthropic import ChatAnthropic
+            return ChatAnthropic(
+                api_key=settings.claude_api_key,
+                model=kwargs.pop("model", "claude-sonnet-4-6"),
+                **kwargs,
+            )
+
         if provider == LLMProvider.OPENAI:
             from langchain_openai import ChatOpenAI
             return ChatOpenAI(

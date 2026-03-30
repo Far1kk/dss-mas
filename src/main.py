@@ -1,3 +1,9 @@
+import sys
+import os
+
+# Добавляем корень проекта в путь чтобы `src.*` находился при запуске python src/main.py
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import uvicorn
 from dotenv import load_dotenv
 
